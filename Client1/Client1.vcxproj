@@ -72,8 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>F:\cpp\finalSecureTrans\protobuf\include;C:\Program Files %28x86%29\OpenSSL-Win32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\cpp\finalSecureTrans\protobuf\lib;C:\Program Files %28x86%29\OpenSSL-Win32\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\cpp\finalSecureTrans\protobuf\include;C:\Program Files %28x86%29\OpenSSL-Win32\include;F:\cpp\finalSecureTrans\json\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\cpp\finalSecureTrans\protobuf\lib;C:\Program Files %28x86%29\OpenSSL-Win32\lib;F:\cpp\finalSecureTrans\json\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,11 +90,12 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;libprotocd.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libprotobufd.lib;libprotocd.lib;libcrypto.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

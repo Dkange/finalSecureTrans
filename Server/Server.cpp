@@ -11,6 +11,7 @@
 //#include <string>
 #include "RsaCrypto.h"
 #include "AesCrypto.h"
+#include "json/json.h"
 
 #pragma comment(lib,"ws2_32.lib")
 using namespace msg;
@@ -64,18 +65,18 @@ void delClient(SOCKET clientsoc)//当客户端断开连接时，从容器中删�
 void sendMsg(char *buf, SOCKET clientsoc)//向所有客户端发送消息
 {
 	std::vector<SOCKET>::iterator it;
-	//for (it = clients.begin(); it != clients.end(); it++) {
-	//	if (send(*it, buf, strlen(buf) + 1, 0) <= 0)
-	//	{
-	//		printf("发送错误!\n");
-	//		break;
-	//	}
-	//}
-	if (send(clientsoc, buf, strlen(buf), 0) <= 0)
-	{
-		printf("发送错误!\n");
-		return;
+	for (it = clients.begin(); it != clients.end(); it++) {
+		if (send(*it, buf, strlen(buf) + 1, 0) <= 0)
+		{
+			printf("发送错误!\n");
+			break;
+		}
 	}
+	//if (send(clientsoc, buf, strlen(buf), 0) <= 0)
+	//{
+	//	printf("发送错误!\n");
+	//	return;
+	//}
 
 }
 
@@ -148,6 +149,7 @@ void recvFromClient(SOCKET clientsoc, char *buf, int number)//接受一个客户
 	}
 }
 
+using namespace Json;
 int main()
 {
 
@@ -158,6 +160,18 @@ int main()
 	char buf[1024];
 	int len;
 	static int listenCount = 0;
+
+	//---------------------------------------json读取服务器配置
+	string jsonFile = "./server.json";
+	//解析json文件 ->Value
+	ifstream ifs(jsonFile);
+	Reader r;
+	Value root;
+	r.parse(ifs, root);
+
+	// 将root中的键值对value值取出
+	string serverIP = root["ServerIP"].asString();
+	unsigned short port = root["Port"].asInt();
 
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);	//初始化WS2_32.DLL
@@ -171,8 +185,8 @@ int main()
 
 	//命名协议，IP，端口
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_port = htons(9102);
-	serveraddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	serveraddr.sin_port = htons(port);
+	serveraddr.sin_addr.S_un.S_addr = inet_addr(serverIP.c_str());//htonl(INADDR_ANY);
 
 	//绑定套接字
 	if (::bind(serversoc, (SOCKADDR *)&serveraddr, sizeof(serveraddr)) != 0)

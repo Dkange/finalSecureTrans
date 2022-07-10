@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #pragma comment(lib,"ws2_32.lib")
+#include "json/json.h"
 using namespace msg;
 static int id;
 
@@ -43,6 +44,7 @@ void recvFromServer(SOCKET clientsocket, char* buf, string& key)
 	}
 }
 string key;
+using namespace Json;
 int main()
 {
 	SOCKET clientsocket;
@@ -50,6 +52,17 @@ int main()
 	SOCKADDR_IN clientaddr;
 	char buf[1024];
 
+	//---------------------------------------json读取客户端配置
+	string jsonFile = "./client.json";
+	//解析json文件 ->Value
+	ifstream ifs1(jsonFile);
+	Reader r;
+	Value root;
+	r.parse(ifs1, root);
+
+	// 将root中的键值对value值取出
+	string serverIP = root["ServerIP"].asString();
+	unsigned short port = root["Port"].asInt();
 
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);	//初始化WS2_32.DLL
@@ -62,9 +75,11 @@ int main()
 		return -1;
 	}
 
+	cout << serverIP << ", 端口:" << port << endl;
+
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_port = htons(9102);
-	serveraddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	serveraddr.sin_port = htons(port);
+	serveraddr.sin_addr.S_un.S_addr = inet_addr(serverIP.c_str());
 
 	//请求连接
 	printf("尝试连接中...\n");
@@ -97,9 +112,9 @@ int main()
 	// 生成密钥对
 	rsa.generateRsakey(1024);
 	// 读公钥文件
-	ifstream ifs("public.pem");
+	ifstream ifs2("public.pem");
 	stringstream str;
-	str << ifs.rdbuf();
+	str << ifs2.rdbuf();
 
 	sendMessage smsgs;
 	char ss[1024];
